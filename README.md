@@ -1,1 +1,1 @@
-# Power-BI-Python-Projects
+# SQL-Power-BI-Python-Projects
