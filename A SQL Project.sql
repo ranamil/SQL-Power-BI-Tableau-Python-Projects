@@ -8,7 +8,6 @@ where l.loan = p.assetid and
 l.summarydatadate = p.datadate and
 p.assetid = m.id and
 p.datadate = m.datadate and
---please enter adverse scenario id
 p.scenarioid = 33589
 
 group by p.scenarioid, l.pool_client, l.loan, m.orgid
@@ -24,7 +23,6 @@ where l.loan = p.assetid and
 l.summarydatadate = p.datadate and
 p.assetid = m.id and
 p.datadate = m.datadate and
---please enter base scenario id
 p.scenarioid = 33591
 
 group by p.scenarioid, l.pool_client, l.loan
@@ -40,7 +38,6 @@ where l.loan = p.assetid and
 l.summarydatadate = p.datadate and
 p.assetid = m.id and
 p.datadate = m.datadate and
---please enter severe scenario id
 p.scenarioid = 33590
 
 group by p.scenarioid, l.pool_client, l.loan
@@ -56,7 +53,6 @@ where l.loan = p.assetid and
 l.summarydatadate = p.datadate and
 p.assetid = m.id and
 p.datadate = m.datadate and
---please enter adverse scenario id
 p.scenarioid = 33589
 
 group by p.scenarioid, l.pool_client
@@ -72,7 +68,6 @@ where l.loan = p.assetid and
 l.summarydatadate = p.datadate and
 p.assetid = m.id and
 p.datadate = m.datadate and
---please enter base scenario id
 p.scenarioid = 33591
 
 group by p.scenarioid, l.pool_client
@@ -80,16 +75,13 @@ group by p.scenarioid, l.pool_client
 
 S as
 (
-
 select p.scenarioid, l.pool_client, count(l.loan) count, sum(p.totalprincipal) upb, sum(p.price) sevprice,
 sum(p.price)/sum(p.totalprincipal) waprice
-
 from loan_summary_fields_wln l, loan_details_main m, pricing_output p
 where l.loan = p.assetid and
 l.summarydatadate = p.datadate and
 p.assetid = m.id and
 p.datadate = m.datadate and
---please enter severe scenario id
 p.scenarioid = 33590
 
 group by p.scenarioid, l.pool_client
@@ -119,30 +111,18 @@ adjvalue as
 select
 
 adv.loan, adv.orgid, adv.pool_client advmgntp, sum(adv.upb) totalprincipal,
-
 sum(base.baseprice) baseprice, sum(adv.advprice) advprice, sum(sev.sevprice) sevprice,
-
---before
---base.baseprice * (1 + final.cre_adverse_b) newadvprice,
---after
---place a floor on the adjusted price so the newadvprice is not over the advprice
-
 case when (base.baseprice * (1 + final.cre_adverse_b)) > adv.advprice
 then adv.advprice
 else base.baseprice * (1 + final.cre_adverse_b)
 end
 newadvprice,
 
---before
---base.baseprice * (1 + final.cre_severe_b) newsevprice,
---after
---place a floor on the adjusted price so the newsevprice is not over the sevprice
 case when (base.baseprice * (1 + final.cre_severe_b)) > sev.sevprice
 then sev.sevprice
 else base.baseprice * (1 + final.cre_severe_b)
 end
 newsevprice,
-
 cre_adverse,
 cre_severe
 
@@ -170,9 +150,7 @@ select
 p.assetid loan_num, p.price price_$, p.totalprincipal upb,
 (p.price/p.totalprincipal) * 100 price_percent
 
---please enter base scenario id
 case when p.scenarioid = 33591 then p.price
---please enter severe scenario id
 when p.assetid = adjvalue.loan and p.scenarioid = 33590 then adjvalue.newsevprice
 --please enter adverse scenario id
 when p.assetid = adjvalue.loan and p.scenarioid = 33589 then adjvalue.newadvprice
@@ -183,8 +161,6 @@ p.scenarioid scenario
 
 from pricing_output p left outer join adjvalue
 on adjvalue.loan = p.assetid
-
---please enter base, adverse and severe scenario ids
 where p.scenarioid = 33591
 )
 
@@ -204,24 +180,10 @@ and ap.loan_num = m.id
 and l.summarydadate = '2023-02-28 00:00:00.000'
 and m.datadate = '2023-02-28 00:00:00.000'
 
---please enter 'RES1', 'RES1OA', 'RES2', 'MF' OR "CRE'
 an l.pool_client = 'RES2'
 
 group by ap.scenario,
 m.orgid,
 l.pool_client
-
+  
 order by cast(m.orgid as int)
-
-
-
-
-
-
-
-
-
-
-
-
-
